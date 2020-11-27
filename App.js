@@ -5,10 +5,12 @@ export default class App extends React.Component {
   constructor() {
     super();
     this.state = {
-      num: ' ',
+      num: '',
       price: 0,
-      disc: 0,
+      disc: '',
       screen: 0,
+      discPrice: 0,
+      saved: 0,
     };
   }
 
@@ -20,25 +22,35 @@ export default class App extends React.Component {
 
   clear = () => {
     this.setState({
-      num: ' ',
+      num: '',
       price: 0,
-      disc: 0
+      disc: '',
     });
   };
 
-  enterPrice = (num) => {
+  enterPrice = () => {
     this.setState({
-      price: this.state.num
+      price: this.state.num,
+      num: '',
+      screen: 1,
+    });
+  };
+
+  enterDiscount = () => {
+    this.setState({
+      disc: this.state.num,
+      discPrice: this.state.price * ((100 - this.state.disc) / 100),
+      saved: this.state.price * (this.state.disc / 100),
+      screen: 2,
     });
   };
 
   render() {
     const Price = (
       <View style={styles.container}>
-        <View style={styles.text}>
-          <Text> Enter Price Of Item </Text>
-          <Text> {this.state.num} </Text>
-        </View>
+        <Text style={styles.textHeading}> DISCOUNT CALCULATOR </Text>
+        <Text style={styles.text}> Enter Price Of Item </Text>
+        <Text style={styles.textInput}> {this.state.num} </Text>
 
         <View style={styles.button}>
           <TouchableOpacity
@@ -95,9 +107,7 @@ export default class App extends React.Component {
         </View>
 
         <View style={styles.button}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.clear}>
+          <TouchableOpacity style={styles.button} onPress={this.clear}>
             <Text> CLEAR </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -105,22 +115,18 @@ export default class App extends React.Component {
             onPress={this.numPressed.bind(this, '0')}>
             <Text> 0 </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.enterPrice}>
+          <TouchableOpacity style={styles.button} onPress={this.enterPrice}>
             <Text> ENTER </Text>
           </TouchableOpacity>
         </View>
-
       </View>
     );
 
     const Discount = (
       <View style={styles.container}>
-        <View style={styles.text}>
-          <Text> Enter Discount Percentage </Text>
-          <Text> {this.state.disc} </Text>
-        </View>
+        <Text style={styles.textHeading}> DISCOUNT CALCULATOR </Text>
+        <Text style={styles.text}> Enter Discount Percentage </Text>
+        <Text style={styles.textInput}> {this.state.num} </Text>
 
         <View style={styles.button}>
           <TouchableOpacity
@@ -177,9 +183,7 @@ export default class App extends React.Component {
         </View>
 
         <View style={styles.button}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.clear}>
+          <TouchableOpacity style={styles.button} onPress={this.clear}>
             <Text> CLEAR </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -187,13 +191,21 @@ export default class App extends React.Component {
             onPress={this.numPressed.bind(this, '0')}>
             <Text> 0 </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.enterPrice}>
+          <TouchableOpacity style={styles.button} onPress={this.enterDiscount}>
             <Text> ENTER </Text>
           </TouchableOpacity>
         </View>
+      </View>
+    );
 
+    const Final = (
+      <View style={styles.container}>
+        <Text style={styles.textHeading}> DISCOUNT CALCULATOR </Text>
+        <Text style={styles.text}> You Saved {this.state.saved}</Text>
+        <Text style={styles.textInput}>
+          {' '}
+          Final Price is {this.state.discPrice}{' '}
+        </Text>
       </View>
     );
 
@@ -203,22 +215,24 @@ export default class App extends React.Component {
     if (this.state.screen === 1) {
       return <View style={styles.container}>{Discount}</View>;
     }
+    if (this.state.screen === 2) {
+      return <View style={styles.container}>{Final}</View>;
+    }
   }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'purple',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   button: {
     alignItems: 'center',
-    backgroundColor: '#DDDDDD',
+    backgroundColor: 'purple',
     padding: 20,
-    paddingBottom: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '55%',
@@ -235,8 +249,22 @@ const styles = StyleSheet.create({
 
   text: {
     fontSize: 20,
+    fontWeight: 'normal',
+    textAlign: 'center',
+  },
+
+  textHeading: {
+    fontSize: 30,
     fontWeight: 'bold',
     textAlign: 'center',
-    margin: 10
+    paddingVertical: 35,
+    paddingBottom: 10,
+  },
+
+  textInput: {
+    fontSize: 35,
+    fontWeight: 'normal',
+    textAlign: 'center',
+    padding: 20,
   },
 });
