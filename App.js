@@ -20,11 +20,26 @@ export default class App extends React.Component {
     });
   };
 
-  clear = () => {
+  clearPrice = () => {
+    this.setState({
+      num: '',
+      price: 0,
+    });
+  };
+
+   clearDiscount = () => {
+    this.setState({
+      num: '',
+      disc: '',
+    });
+  };
+
+  newItem = () => {
     this.setState({
       num: '',
       price: 0,
       disc: '',
+      screen: 0,
     });
   };
 
@@ -39,8 +54,8 @@ export default class App extends React.Component {
   enterDiscount = () => {
     this.setState({
       disc: this.state.num,
-      discPrice: this.state.price * ((100 - this.state.disc) / 100),
-      saved: this.state.price * (this.state.disc / 100),
+      discPrice: (this.state.price) * (100 - this.state.num),
+      saved: this.state.price - this.state.discPrice,
       screen: 2,
     });
   };
@@ -107,7 +122,7 @@ export default class App extends React.Component {
         </View>
 
         <View style={styles.button}>
-          <TouchableOpacity style={styles.button} onPress={this.clear}>
+          <TouchableOpacity style={styles.button} onPress={this.clearPrice}>
             <Text> CLEAR </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -183,7 +198,7 @@ export default class App extends React.Component {
         </View>
 
         <View style={styles.button}>
-          <TouchableOpacity style={styles.button} onPress={this.clear}>
+          <TouchableOpacity style={styles.button} onPress={this.clearDiscount}>
             <Text> CLEAR </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -206,6 +221,9 @@ export default class App extends React.Component {
           {' '}
           Final Price is {this.state.discPrice}{' '}
         </Text>
+        <TouchableOpacity style={styles.button} onPress={this.newItem}>
+            <Text> Enter Another Price </Text>
+          </TouchableOpacity>
       </View>
     );
 
@@ -236,15 +254,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '55%',
-  },
-
-  button2: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '50%',
-    pading: '20',
-    backgroundColor: '#DDDDDD',
   },
 
   text: {
