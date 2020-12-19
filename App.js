@@ -1,279 +1,241 @@
-import React from 'react';
-import { StyleSheet, Text, View, Button, TouchableOpacity } from 'react-native';
+import React, { Component ,componentDidMount} from 'react';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Modal, ScrollView } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
-export default class App extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      num: '',
-      price: 0,
-      disc: '',
-      screen: 0,
-      discPrice: 0,
-      saved: 0,
-    };
+
+ class  CalculatorScreen extends Component {
+   
+  constructor(prop){
+    super(prop);
+    this.state={
+      OriginalPrice:"",
+      DiscountPercentage:"",
+      YouSave:"You Save",
+      FinalPrice:"Final Price",
+      check:false,
+      list:([])
+    }
   }
 
-  numPressed = (num) => {
-    this.setState({
-      num: this.state.num + num,
-    });
-  };
+  //  useList=() => {
 
-  clearPrice = () => {
-    this.setState({
-      num: '',
-      price: 0,
-    });
-  };
+  //   if (this.route.params?.returnList) {
+  //     this.setState({list:this.route.params.returnList})
+  //     this.navigation.setParams({ returnList: undefined });
 
-   clearDiscount = () => {
-    this.setState({
-      num: '',
-      disc: '',
-    });
-  };
+  //   }
+  // };
 
-  newItem = () => {
-    this.setState({
-      num: '',
-      price: 0,
-      disc: '',
-      screen: 0,
-    });
-  };
+  calculation=()=>{
+    if(this.state.OriginalPrice===0 || this.state.DiscountPercentage==="" ){
+      alert("Problem")
+      this.setState({
+        check:false
+      })
+    }
+    else if(this.state.OriginalPrice==0){
+      alert("price cannot be less than 0")
+      this.setState({
+        check:false
+      })
 
-  enterPrice = () => {
-    this.setState({
-      price: this.state.num,
-      num: '',
-      screen: 1,
-    });
-  };
+    }
+    else if(this.state.DiscountPercentage>100){
+      alert("Discount is never greater than 100")
+      this.setState({
+        check:false
+      })
 
-  enterDiscount = () => {
+    }
+    else if(this.state.DiscountPercentage<0){
+      alert("Discount is never lesser than 0")
+      this.setState({
+        check:false
+      })
+
+    }
+    else{
+      const discount=this.state.OriginalPrice-(this.state.OriginalPrice*(this.state.DiscountPercentage/100));
+    const saved=(this.state.OriginalPrice-this.state.OriginalPrice-(this.state.OriginalPrice*(this.state.DiscountPercentage/100)))
     this.setState({
-      disc: this.state.num,
-      discPrice: (this.state.price) * (100 - this.state.num),
-      saved: this.state.price - this.state.discPrice,
-      screen: 2,
-    });
-  };
+      FinalPrice:discount.toFixed(2),
+      YouSave:(Math.abs(saved).toFixed(2)),
+      check:true
+    })
+
+  }}
+  saveInfo=()=>{
+    if(this.state.check==true){
+      this.setState({
+        list:[...this.state.list,
+        {key: Math.random().toString(), OriginalPrice: this.state.OriginalPrice, DiscountP: this.state.DiscountPercentage , FP: this.state.FinalPrice }],
+      })
+      alert("Saved")
+      this.setState({
+        OriginalPrice:"",
+        DiscountPercentage:"",
+        YouSave:"You Save",
+        FinalPrice:"Final Price",
+      })
+
+
+  
+      
+    }
+    else{
+      alert("empty fields")
+    }
+  }
+
 
   render() {
-    const Price = (
-      <View style={styles.container}>
-        <Text style={styles.textHeading}> DISCOUNT CALCULATOR </Text>
-        <Text style={styles.text}> Enter Price Of Item </Text>
-        <Text style={styles.textInput}> {this.state.num} </Text>
+    const { navigation } = this.props;
+    // this.useList();
+  return (
+    <View style={styles.container}>
+      <Text style={{fontSize:22, fontWeight:"bold", marginBottom:45 }}>DISCOUNT CALCULATING APP</Text>
+  
+      <View >
+        
+      <TextInput value={this.state.OriginalPrice} style={styles.input} placeholder="Original price" placeholderTextColor="blue" keyboardType="number-pad"
+      onChangeText={(OriginalPrice)=> this.setState({OriginalPrice})}/>
 
-        <View style={styles.button}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '1')}>
-            <Text> 1 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '2')}>
-            <Text> 2 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '3')}>
-            <Text> 3 </Text>
-          </TouchableOpacity>
+      <TextInput value={this.state.DiscountPercentage} style={styles.input} placeholder="Discount Percentage" placeholderTextColor="blue" keyboardType="number-pad"
+       onChangeText={(DiscountPercentage)=> this.setState({DiscountPercentage})}/>
+
         </View>
+<TouchableOpacity style={styles.btn1} onPress={()=>this.calculation()}><Text style={{fontSize:20, color:"#ffff"}}>Calculate</Text></TouchableOpacity>
 
-        <View style={styles.button}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '4')}>
-            <Text> 4 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '5')}>
-            <Text> 5 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '6')}>
-            <Text> 6 </Text>
-          </TouchableOpacity>
-        </View>
+        <View style={{flexDirection:"row" }}>
+  <Text style={styles.output}>{this.state.FinalPrice}</Text>
+  <Text style={styles.output}>{this.state.YouSave}</Text>
+  </View>
 
-        <View style={styles.button}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '7')}>
-            <Text> 7 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '8')}>
-            <Text> 8 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '9')}>
-            <Text> 9 </Text>
-          </TouchableOpacity>
-        </View>
+  <TouchableOpacity style={styles.btn1} onPress={()=>this.saveInfo()}><Text style={{fontSize:20, color:"#ffff"}}>Save</Text></TouchableOpacity>
+  <TouchableOpacity style={styles.btn1} onPress={()=>this.props.navigation.navigate("History",{list:this.state.list})}><Text style={{fontSize:20, color:"#ffff"}}>View History</Text></TouchableOpacity>
+  
+  </View>
 
-        <View style={styles.button}>
-          <TouchableOpacity style={styles.button} onPress={this.clearPrice}>
-            <Text> CLEAR </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '0')}>
-            <Text> 0 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={this.enterPrice}>
-            <Text> ENTER </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
+  );
+}
 
-    const Discount = (
-      <View style={styles.container}>
-        <Text style={styles.textHeading}> DISCOUNT CALCULATOR </Text>
-        <Text style={styles.text}> Enter Discount Percentage </Text>
-        <Text style={styles.textInput}> {this.state.num} </Text>
+function(props) {
+  const navigation = useNavigation();
 
-        <View style={styles.button}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '1')}>
-            <Text> 1 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '2')}>
-            <Text> 2 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '3')}>
-            <Text> 3 </Text>
-          </TouchableOpacity>
-        </View>
+  return (
+    <StartScreen {...props} navigation={navigation} />);
 
-        <View style={styles.button}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '4')}>
-            <Text> 4 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '5')}>
-            <Text> 5 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '6')}>
-            <Text> 6 </Text>
-          </TouchableOpacity>
-        </View>
+}
+}
 
-        <View style={styles.button}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '7')}>
-            <Text> 7 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '8')}>
-            <Text> 8 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '9')}>
-            <Text> 9 </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.button}>
-          <TouchableOpacity style={styles.button} onPress={this.clearDiscount}>
-            <Text> CLEAR </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.numPressed.bind(this, '0')}>
-            <Text> 0 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={this.enterDiscount}>
-            <Text> ENTER </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-
-    const Final = (
-      <View style={styles.container}>
-        <Text style={styles.textHeading}> DISCOUNT CALCULATOR </Text>
-        <Text style={styles.text}> You Saved {this.state.saved}</Text>
-        <Text style={styles.textInput}>
-          {' '}
-          Final Price is {this.state.discPrice}{' '}
-        </Text>
-        <TouchableOpacity style={styles.button} onPress={this.newItem}>
-            <Text> Enter Another Price </Text>
-          </TouchableOpacity>
-      </View>
-    );
-
-    if (this.state.screen === 0) {
-      return <View style={styles.container}>{Price}</View>;
-    }
-    if (this.state.screen === 1) {
-      return <View style={styles.container}>{Discount}</View>;
-    }
-    if (this.state.screen === 2) {
-      return <View style={styles.container}>{Final}</View>;
+class History extends React.Component {
+  constructor(props){
+    super(props);
+    this.state={
+      list:this.props.route.params.list,
     }
   }
+
+   
+  removeItem =(itemKey)=>{
+   this.setState({
+      list:this.state.list.filter((item) => item.key!=itemKey)
+    })
+  }
+
+
+  render() {
+
+    const { navigation } = this.props;
+
+    return (
+      <View >
+        <ScrollView>
+        {this.state.list.map((item, index) =>
+          <View key={item.key} style={{flexDirection:"row" , marginRight:3, marginTop:20}} >
+            <View style={{borderColor:"blue",borderWidth:2, alignSelf:"center", marginLeft:40}}>
+            <Text style={{fontSize:30, fontWeight:"bold", padding:5}}>Original Price:  {item.OriginalPrice}</Text>
+            <Text style={{fontSize:30, fontWeight:"bold", padding:5}}>Discount %:  {item.DiscountP }</Text>
+            <Text style={{ fontSize:30, fontWeight:"bold", padding:5}}>Final Price :  {item.FP}</Text>
+             <TouchableOpacity  
+            style={styles.btn1} onPress={()=>this.removeItem(item.key)}>
+              <Text style={{color:"#ffff", fontSize:18, fontWeight:"bold" }}>X</Text>
+            </TouchableOpacity>
+           
+            </View>
+          </View>)}
+          
+      </ScrollView>
+      <TouchableOpacity style={styles.btn1}onPress={()=>this.props.navigation.navigate("CalculatorScreen",{returnList:this.state.list})}><Text style={{fontSize:20, color:"#ffff"}}>Back</Text></TouchableOpacity>
+
+      </View>
+    );
+  }
+
 }
+
+const Stack = createStackNavigator();
+export default class App extends Component {
+  render() {
+    return (
+      <NavigationContainer>
+        <Stack.Navigator >
+          <Stack.Screen name="CalculatorScreen" component={CalculatorScreen} />
+          <Stack.Screen name="History" component={History} />
+
+
+
+        </Stack.Navigator>
+      </NavigationContainer>);
+
+  }
+}
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'purple',
+    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  input:{
+    borderBottomWidth:2,
+    margin:7,
+    borderRadius:9,
+    height:30,
+    width:200,
+    textAlign:"center",
+    fontSize:20,
+    padding:4
+   
+    
+  },
+  btn1:{
+    backgroundColor:"blue",
+    padding:8,
+    width:120,
+    textAlign:"center",
+    alignItems:"center",
+    margin:10
 
-  button: {
-    alignItems: 'center',
-    backgroundColor: 'purple',
-    padding: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '55%',
+  },
+  output:{
+    padding:10,
+    borderColor:"black",
+    justifyContent:"center",
+    alignItems:"center",
+    textAlign:"center",
+    fontSize:22,
+    marginTop:40,
+    borderWidth:1,
+    color:"grey",
+    margin:6,
+    width:150,
+   
+
   },
 
-  text: {
-    fontSize: 20,
-    fontWeight: 'normal',
-    textAlign: 'center',
-  },
 
-  textHeading: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    paddingVertical: 35,
-    paddingBottom: 10,
-  },
-
-  textInput: {
-    fontSize: 35,
-    fontWeight: 'normal',
-    textAlign: 'center',
-    padding: 20,
-  },
 });
